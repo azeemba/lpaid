@@ -1,0 +1,10 @@
+{
+  "PLAID": {
+    "APP_PORT": 8000,
+    "CLIENT_ID": "CLIENT_ID",
+    "SECRET": "SECRET",
+    "PUBLIC_KEY": "PUBLIC_KEY",
+    "ENV": "sandbox"
+  },
+  "DB_STRING": "sqlite://db/tartan.db"
+}

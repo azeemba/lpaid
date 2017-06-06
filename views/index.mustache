@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lpaid</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.css">
+
+<body>
+  <div class="ui container">
+    <div class="ui segments">
+      <div class="ui segment">
+        <p>Add a new user or choose an existing user:</p>
+        <div>
+          <input id="displayName" type="text">
+          <button id="addUser">Add User</button>
+        </div>
+        <select id="user">
+          {{#users}}
+            <option value="{{id}}">{{displayName}}</option>
+          {{/users}}
+        </select>
+      </div>
+      <div class="ui segment">
+        <div>
+          <button id="link-btn">Link Account</button>
+        </div>
+      </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.js"></script>
+
+  <script>
+    var handler = Plaid.create({
+      apiVersion: 'v2',
+      clientName: 'Plaid Walkthrough Demo',
+      env: '{{ PLAID_ENV }}',
+      product: ['transactions'],
+      key: '{{ PLAID_PUBLIC_KEY }}',
+      onSuccess: function(public_token) {
+        console.log("Sending put");
+        $.ajax('/item', {
+          method: "PUT",
+          data: {
+            publicToken: public_token,
+            userId: $("#user")[0].value
+          }
+        }, function() {
+          console.log("Resp of put");
+          $('#container').fadeOut('fast', function() {
+            $('#intro').hide();
+            $('#app, #steps').fadeIn('slow');
+          });
+        });
+      },
+    });
+
+    $('#link-btn').on('click', function(e) {
+      handler.open();
+    });
+    $('#addUser').on('click', function(e) {
+      $.ajax('/user', {
+        method: "PUT",
+        data: {
+          displayName: $("#displayName")[0].value
+        }
+      });
+      setTimeout(function() {
+        location.reload();
+      }, 500);
+    });
+  </script>
+</body>
+</html>
