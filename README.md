@@ -37,7 +37,8 @@ To access real world data, you must request development keys which allow you to
 link up to 100 accounts. (Of course Plaid may decide to decline your request or
 even decide to revoke my keys. So no guarantees on that end).
 
-Once you have have the keys, create a new file `config/local.json`. The data should look like the defaul config file except with your new keys.
+Once you have have the keys, create a new file `config/local.json`. 
+The data should look like the defaul config file except with your new keys.
 Also change "ENV" to "development" if you have development keys.
 
 Make sure not to share these keys! `config/local.json` has been
@@ -53,9 +54,16 @@ any other database, jump to the advanced section.
 
 ### Run Account Setup
 
-`node index.js` and then go on `localhost:8000` in your browser. This will
-allow you to link your various accounts so that plaid can fetch the information
-for this account.
+```
+npm install
+node index.js
+```
+
+and then go on `localhost:8000` in your browser. This will allow you to link
+your various accounts so that plaid can fetch the information for this account.
+If your account has multifactor authentication, the first login may fail.
+However, on the second attempt, plaid will attempt the other form of
+authentication as well.
 
 Once your accounts are linked, you should wait a little bit so that plaid has
 time to load all the linked data (roughly 30ish mins).
@@ -64,7 +72,7 @@ time to load all the linked data (roughly 30ish mins).
 
 `node cli.js --help` will tell you what commands you have available.
 
-Normally you will only want to do:
+Normally you will only need to do:
 
  - `node cli.js fetch`: this will retrieve transactions for the past 30 days
    for all your accounts.
@@ -75,7 +83,7 @@ Normally you will only want to do:
    days to have a running balance`.
 
  Note that the above command assumes that there is only one "user" in your
- db. If you have multipel users, then the commands accept the user id
+ db. If you have multiple users, then the commands accept the user id
  (integer) as the first argument after the command name.
 
 
