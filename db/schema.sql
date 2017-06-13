@@ -11,6 +11,8 @@ DROP TABLE IF EXISTS items;
 CREATE TABLE items (
   id TEXT PRIMARY KEY NOT NULL,
   access_token TEXT,
+  institution_id TEXT,
+  institution_name TEXT,
   user_id INTEGER,
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
@@ -20,7 +22,6 @@ DROP TABLE IF EXISTS accounts;
 CREATE TABLE accounts (
   id TEXT PRIMARY KEY NOT NULL,
   item_id TEXT,
-  institution_id TEXT,
   balance INTEGER NOT NULL,
   name TEXT,
   mask TEXT, -- last 4 digits to display

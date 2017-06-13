@@ -4,8 +4,6 @@
 var config = require('config');
 var express = require('express');
 var bodyParser = require('body-parser');
-var moment = require('moment');
-var plaid = require('plaid');
 var Sequelize = require('sequelize');
 var mustacheExpress = require('mustache-express');
 
@@ -34,15 +32,63 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-app.get('/', function(request, response, next) {
+app.get('/', function(request, response) {
   Models.User.findAll()
   .then((users) => {
     console.log(users.map((user) => user.toJSON()));
-    response.render('index.mustache', {
+    response.render('user-select.mustache', {
       PLAID_PUBLIC_KEY: PLAID_PUBLIC_KEY,
       PLAID_ENV: PLAID_ENV,
       users: users.map((user) => user.toJSON())
     });
+  })
+});
+
+app.param("user", function(req, res, next, id) {
+  Models.User.findById(id)
+  .then((user) => {
+    req.user = user;
+    next();
+  }).catch((err) => {
+    console.log(err);
+    next(err);
+  });
+});
+
+app.get('/user/:user', function(req, res) {
+  Models.Item.findAll()
+  .then(items => {
+    return Promise.all(items.map(item => {
+      return plaidClient.validateItem(item.accessToken)
+      .then(valid => {
+        let publicToken = Promise.resolve(false);
+        if (!valid) {
+          publicToken =
+            plaidClient.createPublicToken(item.accessToken)
+        }
+        return publicToken;
+      }).then(publicToken => ({
+        institution: item.institutionName,
+        publicToken: publicToken.public_token 
+      })).catch(e => {
+        console.log("Unexpected failure to create publicToken",
+            item.toJSON());
+        console.log(e);
+        return {
+          institution: item.institutionName,
+          error: true
+        };
+      });
+    }));
+  }).then(items => {
+    res.render('index.mustache', {
+      userId: req.user.id,
+      displayName: req.user.displayName,
+      PLAID_PUBLIC_KEY: PLAID_PUBLIC_KEY,
+      PLAID_ENV: PLAID_ENV,
+      items: items
+    });
+
   })
 });
 
@@ -64,7 +110,7 @@ app.put("/user", function(req, res) {
       id: id+1
     });
   }).then((result) => {
-    res.json(result);
+    res.json(result.toJSON());
   });
 });
 

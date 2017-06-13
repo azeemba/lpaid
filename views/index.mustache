@@ -8,24 +8,41 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.css">
 
 <body>
+  <h1 class="ui header">{{displayName}}</h1>
   <div class="ui container">
     <div class="ui segments">
-      <div class="ui segment">
-        <p>Add a new user or choose an existing user:</p>
+     <div class="ui segment">
         <div>
-          <input id="displayName" type="text">
-          <button id="addUser">Add User</button>
+          <button id="link-btn">Add Account</button>
         </div>
-        <select id="user">
-          {{#users}}
-            <option value="{{id}}">{{displayName}}</option>
-          {{/users}}
-        </select>
       </div>
       <div class="ui segment">
-        <div>
-          <button id="link-btn">Link Account</button>
-        </div>
+        <table class="ui basic table">
+          <thead>
+            <tr>
+              <th>Institution</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+          {{#items}}
+            <tr>
+              <td>{{institution}}</td>
+              <td>
+                {{#publicToken}}
+                  <button class="ui negative button" value={{publicToken}}>Needs Relink</button>
+                {{/publicToken}}
+                {{^publicToken}}
+                  <label class="ui green label">Linked</label>
+                {{/publicToken}}
+                {{#error}}
+                  <label class="ui red label">Unexpected Error</label>
+                {{/error}}
+              </td>
+            </tr>
+          {{/items}}
+          </tbody>
+        </table>
       </div>
   </div>
 
@@ -46,7 +63,7 @@
           method: "PUT",
           data: {
             publicToken: public_token,
-            userId: $("#user")[0].value
+            userId: {{userId}}
           }
         }, function() {
           console.log("Resp of put");
@@ -60,17 +77,6 @@
 
     $('#link-btn').on('click', function(e) {
       handler.open();
-    });
-    $('#addUser').on('click', function(e) {
-      $.ajax('/user', {
-        method: "PUT",
-        data: {
-          displayName: $("#displayName")[0].value
-        }
-      });
-      setTimeout(function() {
-        location.reload();
-      }, 500);
     });
   </script>
 </body>

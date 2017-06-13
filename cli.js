@@ -4,7 +4,6 @@
 var commander = require('commander');
 var config = require('config');
 var moment = require('moment');
-var plaid = require('plaid');
 var Sequelize = require('sequelize');
 
 // internal deps
@@ -48,6 +47,38 @@ function initCommands() {
       let user = parseIntOrDefault(userId, 1);
       let tokensPromise = getAllAccessTokens(user);
       tokensPromise.then(fetchAccounts);
+    });
+
+  commander
+    .command('updateItemInfo [userId]')
+    .action(function(userId) {
+      let user = parseIntOrDefault(userId, 1);
+      let tokensPromise = getAllAccessTokens(user);
+      tokensPromise.then((tokens) => {
+        return plaid.getItems(tokens)
+      }).then((resp) => {
+        resp.map((item) => {
+          let itemId = item.item.item_id;
+          let instId = item.item.institution_id;
+          plaid.getInstitutionById(instId)
+          .then((inst) => {
+            let name = inst.institution.name;
+            return Models.Item.update({
+              "institutionId": instId,
+              "institutionName": name
+            },
+            {
+              "where": {
+                "id": itemId
+              }
+            })
+          }).then(console.log.bind(console))
+          .catch((e) => {
+            console.log("Failed for ", itemId, instId);
+            console.log(e);
+          })
+        });
+      });
     });
 
   commander

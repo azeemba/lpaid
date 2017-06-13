@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "nodemon -w ./ index.js"
+    "watch": "nodemon -w ./ -e js,mustache,md index.js"
   },
   "author": "",
   "license": "UNLICENSED",

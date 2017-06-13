@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lpaid</title>
+</head>
+
+{{>head}}
+
+<body>
+  <div class="ui container">
+    <div class="ui form">
+        <p>Add a new user or choose an existing user:</p>
+        <div class="field">
+          <input id="displayName" type="text" placeholder="New User Name">
+          <button id="addUser" class="ui secondary button">Add User</button>
+        </div>
+        <div class="field">
+            <select class="ui fluid dropdown" id="user">
+            {{#users}}
+                <option value="{{id}}">{{displayName}}</option>
+            {{/users}}
+            </select>
+            <button class="ui primary button" id="pickUser">Pick</button>
+        </div>
+    </div>
+  </div>
+
+  {{> jslibs}}
+  <script>
+    $('#addUser').on('click', function(e) {
+      $.ajax('/user', {
+        method: "PUT",
+        data: {
+          displayName: $("#displayName")[0].value
+        },
+        success: function(user) {
+            location.href = "/user/" + user.id;
+        }
+      });
+    });
+
+    $("#pickUser").on('click', function(e) {
+        location.href = "/user/" + $("#user")[0].value
+    });
+  </script>
+
+</body>
+ 
+
+</html>
+
