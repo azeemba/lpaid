@@ -30,6 +30,7 @@ CREATE TABLE accounts (
 );
 CREATE INDEX accounts_item_id ON accounts(item_id);
 
+DROP TABLE IF EXISTS balance_history;
 CREATE TABLE balance_history (
   -- represents the balance history
   -- unfortunately plaid doesn't have this historical data so we have
@@ -39,7 +40,7 @@ CREATE TABLE balance_history (
   balance INTEGER NOT NULL,
   PRIMARY KEY(account_id, date_of),
   FOREIGN KEY(account_id) REFERENCES accounts(id)
-)
+);
 
 DROP TABLE IF EXISTS transactions;
 CREATE TABLE transactions (
