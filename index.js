@@ -139,7 +139,9 @@ app.get("/items", function(req, res) {
 app.put("/item", function(req, res) {
   let publicToken = req.body.publicToken;
   let userId = req.body.userId;
-  console.log("/item: ", publicToken, userId);
+  let instName = req.body.institutionName;
+  let instId = req.body.institutionId;
+  console.log("/item: ", publicToken, userId, instName, instId);
   plaidClient.exchangePublicToken(publicToken, function(error, tokenResponse) {
     console.log("/item: ", publicToken, userId, tokenResponse, error);
     if (error != null) {
@@ -152,7 +154,9 @@ app.put("/item", function(req, res) {
     Models.Item.create({
       id: tokenResponse.item_id,
       accessToken: tokenResponse.access_token,
-      userId: userId
+      userId: userId,
+      institutionName: instName,
+      institutionId: instId
     }).then((result) => {
       res.json(result);
     });

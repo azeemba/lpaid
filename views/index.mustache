@@ -68,16 +68,19 @@
     }
 
     $('#link-btn').on('click', function(e) {
-      function onSuccess(public_token) {
-        console.log("Sending put");
+      function onSuccess(public_token, metadata) {
+        console.log("Sending put ", metadata);
         $.ajax('/item', {
           method: "PUT",
           data: {
             publicToken: public_token,
+            institutionName: metadata.institution.name,
+            institutionId: metadata.institution.institution_id,
             userId: {{userId}}
+          },
+          complete: function() {
+            window.location.reload(true);
           }
-        }, function() {
-          console.log("Resp of put");
         });
       }
       let handler = makeHandler(undefined, onSuccess);
