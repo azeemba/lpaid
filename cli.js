@@ -94,7 +94,10 @@ function initCommands() {
         include: [{
           model: Models.Account,
           where: {
-            type: 'depository'
+            $or: [
+              {type: 'depository'},
+              {type: 'other'}
+            ]
           }
         }],
         where: {

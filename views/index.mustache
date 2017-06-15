@@ -30,7 +30,7 @@
               <td>{{institution}}</td>
               <td>
                 {{#publicToken}}
-                  <button class="ui negative button" value={{publicToken}}>Needs Relink</button>
+                  <button class="ui negative button relink" value={{publicToken}}>Needs Relink</button>
                 {{/publicToken}}
                 {{^publicToken}}
                   <label class="ui green label">Linked</label>
@@ -51,13 +51,24 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.js"></script>
 
   <script>
-    var handler = Plaid.create({
-      apiVersion: 'v2',
-      clientName: 'Lpaid',
-      env: '{{ PLAID_ENV }}',
-      product: ['transactions'],
-      key: '{{ PLAID_PUBLIC_KEY }}',
-      onSuccess: function(public_token) {
+    function makeHandler(publicToken, onSuccess) {
+      let config = {
+        apiVersion: 'v2',
+        clientName: 'Lpaid',
+        env: '{{ PLAID_ENV }}',
+        product: ['transactions'],
+        key: '{{ PLAID_PUBLIC_KEY }}',
+        onSuccess: onSuccess,
+      };
+      if (publicToken) {
+        config.token = publicToken;
+      }
+      var handler = Plaid.create(config);
+      return handler;
+    }
+
+    $('#link-btn').on('click', function(e) {
+      function onSuccess(public_token) {
         console.log("Sending put");
         $.ajax('/item', {
           method: "PUT",
@@ -67,17 +78,25 @@
           }
         }, function() {
           console.log("Resp of put");
-          $('#container').fadeOut('fast', function() {
-            $('#intro').hide();
-            $('#app, #steps').fadeIn('slow');
-          });
         });
-      },
-    });
-
-    $('#link-btn').on('click', function(e) {
+      }
+      let handler = makeHandler(undefined, onSuccess);
       handler.open();
     });
+
+    function relinkClick(event) {
+      let button = event.currentTarget;
+      function onSuccess(token, metadata) {
+        console.log("Relink succesful! ", token, metadata);
+      }
+      let handler = makeHandler(button.value, onSuccess);
+      handler.open();
+    }
+    let buttons = document.getElementsByClassName('relink');
+    for (let i = 0; i < buttons.length; i++) {
+      buttons[i].addEventListener('click', relinkClick);
+    }
+
   </script>
 </body>
 </html>
