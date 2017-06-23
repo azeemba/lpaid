@@ -119,7 +119,7 @@ function initCommands() {
         });
         return Models.BalanceHistory.bulkCreate(balances)
       }).then((models) => {
-        console.log("Succesfully wrote balances: ", balances.length);
+        console.log("Succesfully wrote balances: ", models.length);
       })
       .catch(console.log.bind(console));
     });
