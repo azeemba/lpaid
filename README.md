@@ -6,15 +6,15 @@ Personal Plaid-based money tracker
 # Goal
 
 There are many money tracking apps out there with many tradeoffs. Some
-require too much manual work, others store the transactions and account info on
-their servers, and others yet store the login info itself on their servers. 
+require too much manual work, some don't work with multifactor authentication,
+and others store the login info on their servers. 
 
-Lpaid does none of those. It uses Plaid which allows you to link your bank
+Lpaid does none of those. It uses [Plaid](https://plaid.com/) which allows you to link your bank
 accounts to an access token which can be used to retrieve transaction. This
-access token and the downloaded transactions are stored only on your machine.
+access token and the downloaded transactions are stored on your machine.
 
-However the trade off is that Lpaid is not easy to use for people with little
-technical background. 
+However the trade off is that Lpaid is not designed to be used for people with little
+technical background. It requires people to get developer keys from plaid, and run `npm`and `node` locally.
 
 # Design
 
@@ -24,22 +24,20 @@ Lpaid contains two components:
    added/removed)
  - Update script (fetches new transactions for all accounts)
 
-Lpaid provides nothing to help analyze the data. Maybe with time example
-scripts to analyze the data might be added.
+Lpaid provides nothing to help analyze the data. The plan is to keep the db schema consistent to allow many possible "frontends" to analyze the data.
 
 # Set up
 
 ### Set up keys 
-Currently `config/default.json` contains dummy values of keys that plaid
-provides. In order to be able to access test or real world data, you must
+Currently `config/default.json` contains dummy values that do not work.
+In order to be able to access test or real world data, you must
 create a new plaid account. Upon account creation, you will get "sandbox" keys.
 To access real world data, you must request development keys which allow you to
 link up to 100 accounts. (Of course Plaid may decide to decline your request or
 even decide to revoke my keys. So no guarantees on that end).
 
 Once you have have the keys, create a new file `config/local.json`. 
-The data should look like the defaul config file except with your new keys.
-Also change "ENV" to "development" if you have development keys.
+The data should look like the defaul config file. Also change "ENV" to "development" if you have development keys.
 
 Make sure not to share these keys! `config/local.json` has been
 added to the `.gitignore` to avoid any accidental commits.
@@ -63,10 +61,12 @@ and then go on `localhost:8000` in your browser. This will allow you to link
 your various accounts so that plaid can fetch the information for this account.
 If your account has multifactor authentication, the first login may fail.
 However, on the second attempt, plaid will attempt the other form of
-authentication as well.
+authentication as well. 
 
 Once your accounts are linked, you should wait a little bit so that plaid has
 time to load all the linked data (roughly 30ish mins).
+
+If any of your login information changes, you can rerun this server to update the login information. 
 
 ### Fetch transactions
 
@@ -103,5 +103,7 @@ db.
 Currently, Lpaid provides no scripts to analyze the data. However, the existing
 code should be easy to leverage to do analysis. Additionally, many other
 languages have libraries to easily talk to sqlite3 databases.
+
+The goal is to have various frontends to the current db schema.
 
 
