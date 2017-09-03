@@ -23,6 +23,13 @@ sequelize.sync();
 var Models = new ModelClass(sequelize);
 
 var app = express();
+
+app.use(function (req, res, next) {
+  console.log('Request for: "%s" by ip=%s user=', req.url, req.ip, req.user);
+  next();
+});
+
+
 app.use(express.static('public'));
 app.set('view engine', 'mustache');
 app.engine('mustache', mustacheExpress());
@@ -176,7 +183,7 @@ app.put("/item", function(req, res) {
     if (error != null) {
       var msg = 'Could not exchange public_token!';
       console.log(msg + '\n' + error);
-      return response.json({
+      return res.json({
         error: msg
       });
     }
@@ -187,7 +194,7 @@ app.put("/item", function(req, res) {
       institutionName: instName,
       institutionId: instId
     }).then((result) => {
-      res.json(result);
+      res.json(result.toJSON());
     });
   });
 });
