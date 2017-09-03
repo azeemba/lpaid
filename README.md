@@ -16,6 +16,18 @@ access token and the downloaded transactions are stored on your machine.
 However the trade off is that Lpaid is not designed to be used for people with little
 technical background. It requires people to get developer keys from plaid, and run `npm`and `node` locally.
 
+# Workflow
+
+After running `node index.js` you will see a page to add new users or select a user:
+
+![lpaid-pick-user](https://user-images.githubusercontent.com/2160795/30006235-f96b94fc-90c1-11e7-9039-cdb1defa8cc0.png)
+
+Once you pick the user, you will be taken to a screen where you can add new accounts or revalidate accounts for which passwords have changed:
+![lpaid-accounts](https://user-images.githubusercontent.com/2160795/30006234-f4f69160-90c1-11e7-9db0-4c8c2d6ffcd0.png)
+
+After you use `node cli.js` to fetch transactions, you can use the website to look at recent transactions:
+![lpaid-transactions](https://user-images.githubusercontent.com/2160795/30006236-fbf82ab4-90c1-11e7-874a-e801dcdce7a3.png)
+
 # Design
 
 Lpaid contains two components:
