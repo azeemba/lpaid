@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <title>Lpaid</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.css">
+{{>head}}
 
 <body>
   <h1 class="ui header">{{displayName}}</h1>
@@ -46,9 +45,7 @@
       </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
-  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.js"></script>
+  {{> jslibs}}
 
   <script>
     function makeHandler(publicToken, onSuccess) {

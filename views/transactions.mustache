@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lpaid</title>
+
+{{>head}}
+
+<body> 
+  <h1 class="ui header">{{displayName}}</h1>
+  <div class="ui container">
+    <div class="ui segment">
+        <table class="ui celled selectable striped table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Charge</th>
+              <th>Amount</th>
+              <th>Account</th>
+              <th>Category</th>
+              <th>Location</th>
+            </tr>
+          </thead>
+          <tbody>
+          {{#transactions}}
+            <tr>
+              <td>{{dateOf}}</td>
+              <td>{{name}}</td>
+              <td {{#drawPositive}} class="positive"{{/drawPositive}}>
+                {{amount}}
+               </td>
+              <td>{{accountName}}</td>
+              <td>{{categories}}</td>
+              <td>{{location}}</td>
+            </tr>
+          {{/transactions}}
+          </tbody>
+        </table>
+      </div>
+  </div> 
+
+  {{> jslibs}}
+
+</body>
+</html>

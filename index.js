@@ -6,6 +6,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var Sequelize = require('sequelize');
 var mustacheExpress = require('mustache-express');
+var moment = require('moment');
 
 // internal deps
 var ModelClass = require('./lib/model.js');
@@ -123,10 +124,67 @@ app.get('/user/:user/transactions/:page?', function(req, res) {
         } 
       }]
     }]
-  }).then(balances => {
-    res.json(balances);
+  }).then(transactions=> {
+    transactions = transactions.map(t => {
+      let transaction = t.toJSON();
+      //we don't have time accuracy in the underlying data
+      // so limit to date
+      transaction.dateOf = moment(transaction.dateOf).format(
+        "dddd, MMMM Do YYYY");
+      let dollars = Number.parseInt(transaction.amount, 10)/100;
+      transaction.amount = dollars.toLocaleString(
+        undefined, {
+          style: "currency",
+          currency: "USD"
+        });
+
+      transaction.drawPositive = dollars < 0; // negative charge is positive
+      transaction.location = prettyPickLocation(transaction.location);
+      let accountName = 
+        transaction.account.name + " " + transaction.account.mask;
+      if (transaction.account.name == "CREDIT CARD") {
+        accountName = transaction.account.item.institutionName + " " + accountName;
+      }
+      transaction.accountName = accountName;
+      
+      return transaction;
+    });
+
+    res.render('transactions.mustache', {
+      userId: req.user.id,
+      displayName: req.user.displayName,
+      transactions: transactions
+    })
   });
 });
+
+function prettyPickLocation(locationStr) {
+  try {
+    let location = JSON.parse(locationStr);
+    let output = '';
+    if (location.zip) {
+      output = output + location.zip;
+    }
+    if (location.state) {
+      output = location.state + " " + output;
+    }
+    if (location.store_number) {
+      output = "Store # " + location.store_number + " " + output;
+    }
+    if (location.city) {
+      output = location.city + " " + output;
+    }
+    if (location.address) {
+      output = location.address + " " + output;
+    }
+    return output;
+    // lat/lon are ignored
+  }
+  catch (e) {
+    console.error(e);
+    return '';
+  }
+}
 
 app.get("/users", function(req, res) {
   Models.User.findAll()
@@ -146,7 +204,7 @@ app.put("/user", function(req, res) {
       id: id+1
     });
   }).then((result) => {
-    res.json(result.toJSON());
+    res.json(result);
   });
 });
 
@@ -194,7 +252,7 @@ app.put("/item", function(req, res) {
       institutionName: instName,
       institutionId: instId
     }).then((result) => {
-      res.json(result.toJSON());
+      res.json(result);
     });
   });
 });
