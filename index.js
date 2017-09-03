@@ -56,8 +56,11 @@ app.param("user", function(req, res, next, id) {
 });
 
 app.get('/user/:user', function(req, res) {
-  Models.Item.findAll()
-  .then(items => {
+  Models.Item.findAll({
+    where: {
+      userId: Number.parseInt(req.params.user, 10)
+    }
+  }).then(items => {
     return Promise.all(items.map(item => {
       return plaidClient.validateItem(item.accessToken)
       .then(valid => {
