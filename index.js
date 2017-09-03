@@ -92,6 +92,32 @@ app.get('/user/:user', function(req, res) {
   })
 });
 
+app.get('/user/:user/transactions/:page?', function(req, res) {
+  const itemsPerPage = 30;
+  const order = ['dateOf', 'DESC']; // default to get latest
+  let page = 0;
+  if (req.params.page) {
+    page = Number.parseInt(req.params.page, 10)
+  }
+  let offset = page*itemsPerPage;
+  Models.Transaction.findAll({
+    order: [order],
+    offset,
+    limit: itemsPerPage,
+    include: [{
+      model: Models.Account,
+      include: [{
+        model: Models.Item,
+        where: {
+          userId: Number.parseInt(req.params.user, 10)
+        } 
+      }]
+    }]
+  }).then(balances => {
+    res.json(balances);
+  });
+});
+
 app.get("/users", function(req, res) {
   Models.User.findAll()
   .then((users) => {
