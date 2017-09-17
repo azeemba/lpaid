@@ -131,6 +131,8 @@ app.get('/user/:user/transactions/:page?', function(req, res) {
       // so limit to date
       transaction.dateOf = moment(transaction.dateOf).format(
         "dddd, MMMM Do YYYY");
+      transaction.updatedAt = moment(transaction.updatedAt).format(
+          "MMM Do, YYYY")
       let dollars = Number.parseInt(transaction.amount, 10)/100;
       transaction.amount = dollars.toLocaleString(
         undefined, {
@@ -264,6 +266,16 @@ app.delete("/item", function(req, res) {
     }
   }).then((row) => {
     res.json(row);
+  });
+});
+
+app.delete("/transaction", function(req, res) {
+  Models.Transaction.destroy({
+    where: {
+      id: req.body.id
+    }
+  }).then((row) => {
+    res.send('Success');
   });
 });
 

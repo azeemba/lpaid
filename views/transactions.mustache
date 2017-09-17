@@ -19,6 +19,8 @@
               <th>Account</th>
               <th>Category</th>
               <th>Location</th>
+              <th>Updated</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -32,6 +34,15 @@
               <td>{{accountName}}</td>
               <td>{{categories}}</td>
               <td>{{location}}</td>
+              <td>{{updatedAt}}</td>
+              <td>
+                <button class="mini ui icon button negative"
+                        type="button"
+                        onclick="deleteTransaction('{{id}}')"
+                        value="{{id}}">
+                    <i class="remove icon"></i>
+                </button>
+              </td>
             </tr>
           {{/transactions}}
           </tbody>
@@ -40,6 +51,19 @@
   </div> 
 
   {{> jslibs}}
+  <script>
+    function deleteTransaction(id) {
+      $.ajax('/transaction', {
+        method: "DELETE",
+        data: {
+          id: id
+        },
+        complete: function() {
+          window.location.reload(true);
+        }
+      });
+    }
+  </script>
 
 </body>
 </html>

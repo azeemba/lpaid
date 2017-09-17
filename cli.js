@@ -165,14 +165,23 @@ function fetchAccounts(itemTokens) {
 }
 
 function fetchTransactions(itemTokens, days) {
-  return plaid.getTransactions(itemTokens, days)
-    .then(function(transactions) {
-      return Models.Transaction.bulkCreate(transactions, {
-        ignoreDuplicates: true
+  return plaid.getTransactionsPastNDays(itemTokens, days)
+    .then(function({startDate, endDate, transactions}) {
+      let promises = transactions.map((transaction) => {
+        return Models.Transaction.upsert(transaction);
       });
-    }).then(function(rows) {
-      console.log("Number of transactions added: ", rows.length);
-  });
+      return promises;
+    }).then(function(createdBooleanList) {
+      return Promise.all(createdBooleanList)
+    }).then(function(createdBooleanList) {
+      console.log(createdBooleanList);
+      let totalCreated = createdBooleanList.reduce(
+          (sum, value) => sum + (value ? 1 : 0), 0);
+      console.log("Number of transactions upserted: ",
+          createdBooleanList.length);
+      console.log("Number of transactions explicitly created: ",
+          totalCreated);
+    });
 }
 
 function parseIntOrDefault(str, def) {
