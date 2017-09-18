@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lpaid</title>
+
+{{>head}}
+
+<body> 
+  <h1 class="ui header">{{displayName}}</h1>
+  <div id="plot" class="ui container">
+  </div>
+
+  {{> jslibs}}
+  <script>
+    let data;
+
+    $.ajax('/user/{{userId}}/balances', {
+      method: "POST",
+      data: { },
+      complete: function(response) {
+        setData(response.responseJSON);
+        plotData();
+      }
+    });
+
+    function setData(balances) {
+      data = balances;
+    }
+    function plotData() {
+      let accounts = partitionByAccounts(data);
+      let plotlyTraces = Object.keys(accounts).map(
+          accountId => makeTracesFromAccount(accounts[accountId]));
+      Plotly.plot('plot', plotlyTraces);
+    }
+    function partitionByAccounts(data) {
+      let accounts = {};
+      for (datum of data) {
+        if (accounts[datum.accountId]) {
+          accounts[datum.accountId].push(datum)
+        }
+        else {
+          accounts[datum.accountId] = [datum]
+        }
+      }
+      return accounts;
+    }
+    function makeTracesFromAccount(account) {
+      if (account.length == 0) {
+        return;
+      }
+      let trace = {x: [], y: [], name: account[0].account.name};
+      let x = trace.x;
+      let y = trace.y;
+      for (balance of account) {
+        x.push(balance.dateOf);
+        y.push(balance.balance);
+      }
+      return trace;
+    }
+  </script>
+
+</body>
+</html>
+ 

@@ -103,6 +103,30 @@ app.get('/user/:user', function(req, res) {
   })
 });
 
+app.get('/user/:user/balances', function(req, res) {
+  res.render('balance.mustache', {
+      userId: req.user.id,
+      displayName: req.user.displayName,
+  });
+});
+app.post('/user/:user/balances', function(req, res) {
+  let balances = Models.BalanceHistory.findAll({
+    include: [{
+      model: Models.Account,
+      where: {
+        $or: [
+          {type: 'depository'},
+          {type: 'other'}
+        ]
+      }
+    }]
+  });
+  balances.then(bs => {
+    let jsonBalances = bs.map(b => b.toJSON());
+    res.json(jsonBalances);
+  });
+});
+
 app.get('/user/:user/transactions/:page?', function(req, res) {
   const itemsPerPage = 30;
   const order = ['dateOf', 'DESC']; // default to get latest
