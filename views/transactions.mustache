@@ -10,7 +10,7 @@
   <h1 class="ui header">{{displayName}}</h1>
   <div class="ui container">
     <div class="ui segment">
-        <table class="ui celled selectable striped table">
+        <table class="ui celled table">
           <thead>
             <tr>
               <th>Date</th>
@@ -23,12 +23,12 @@
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="transactions">
           {{#transactions}}
-            <tr>
+          <tr id='{{id}}'>
               <td>{{dateOf}}</td>
               <td>{{name}}</td>
-              <td {{#drawPositive}} class="positive"{{/drawPositive}}>
+              <td value={{cents}} {{#drawPositive}} class="positive"{{/drawPositive}}>
                 {{amount}}
                </td>
               <td>{{accountName}}</td>
@@ -42,6 +42,11 @@
                         value="{{id}}">
                     <i class="remove icon"></i>
                 </button>
+                <button class="mini ui icon button"
+                        type="button"
+                        onclick="findSimilar('{{id}}')">
+                    <i class="search icon"></i>
+                  </button>
               </td>
             </tr>
           {{/transactions}}
@@ -62,6 +67,49 @@
           window.location.reload(true);
         }
       });
+    }
+
+    function clearMarkedRows() {
+      let rows = $("#transactions").children();
+      $.each(rows, function(index, row) {
+        $(row).removeClass('error');
+      });
+    }
+
+    function markRow(row) {
+      $(row).addClass('error');
+    }
+
+    function findSimilar(id) {
+      let rows = $("#transactions").children();
+      let targetRow = $("#"+id).children();
+
+      let targetName = targetRow[1].textContent;
+      let targetAmount = targetRow[2].getAttribute('value');
+      let targetAccount = targetRow[3].textContent;
+
+      clearMarkedRows();
+      for (let i = 0; i < rows.length; ++i) {
+        let matchCount = 0;
+        let row = rows[i].children;
+
+        if (targetName == row[1].textContent) {
+          matchCount++;
+        }
+
+        // the two amounts are within 10 cents
+        if (Math.abs(targetAmount - row[2].getAttribute('value')) < 10) {
+          matchCount++;
+        }
+
+        if (targetAccount == row[3].textContent) {
+          matchCount++;
+        }
+
+        if (matchCount >= 2) {
+          markRow(rows[i]);
+        }
+      }
     }
   </script>
 

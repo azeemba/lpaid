@@ -156,7 +156,9 @@ app.get('/user/:user/transactions/:page?', function(req, res) {
       transaction.dateOf = moment(transaction.dateOf).format(
         "dddd, MMMM Do YYYY");
       transaction.updatedAt = moment(transaction.updatedAt).format(
-          "MMM Do, YYYY")
+          "MMM Do, YYYY");
+
+      transaction.cents = transaction.amount;
       let dollars = Number.parseInt(transaction.amount, 10)/100;
       transaction.amount = dollars.toLocaleString(
         undefined, {
